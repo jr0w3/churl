@@ -1,6 +1,6 @@
 #!/bin/bash
 # URL checker who work like ping with curl
-# 
+# THIS SCRIPT WORK BUT I NEED TO OPTIMISE IT AND CHECK SOME USER INPUT ERROR
 url=$1;
 option=$2;
 
