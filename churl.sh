@@ -29,7 +29,8 @@ function check_host()
 	fi
 }
 
-function show_usage (){
+function show_usage()
+{
     echo "Usage: churl [host (ip or url)] [parameters]]"
 	echo ""
     echo "Options:"
