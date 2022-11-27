@@ -5,61 +5,62 @@ url=$1;
 option=$2;
 
 #Check function
-Check()
+function check_host()
 {
 	curl -m 2 $url > /dev/null 2>&1
 	code=$?
 	if [ $code -eq 0 ]
 	 then
-  	 echo "La cible $url est en ligne!"
+  	 echo "$url is online!"
 	elif [ $code -eq 6 ]
  	 then
-  	 echo "Erreur: L'adresse du serveur donné n'a pas pu être résolue. Soit le nom d'hôte donné est tout simplement faux, soit le serveur DNS est mal configuré."
+  	 echo "Error: Could not resolve host. The given remote host was not resolved."
 	elif [ $code -eq 2 ]
  	 then
-  	 echo "Erreur: Échec de l'initialisation. Il s'agit principalement d'une erreur interne ou d'un problème avec l'installation de libcurl ou le système dans lequel libcurl s'exécute.."
+  	 echo "Error: Failed to initialize. This is mostly an internal error or a problem with the libcurl installation or system libcurl runs in."
 	elif [ $code -eq 28 ]
  	then
-  	 echo "Erreur: Délais de la requête expirée. La cible n'a pas répondu dans le temps imparti."
+  	 echo "Error: Operation timeout. The specified time-out period was reached according to the conditions. curl offers several timeouts, and this exit code tells one of those timeout limits were reached. Extend the timeout or try changing something else that allows curl to finish its operation faster. Often, this happens due to network and remote server situations that you cannot affect locally."
 	elif [ $code -eq 7 ]
  	then
-  	 echo "Erreur: Échec de la connexion à l'hôte $url. Curl a réussi à obtenir une adresse IP sur la machine et a essayé de configurer une connexion TCP à l'hôte mais a échoué."
+  	 echo "Error: Failed to connect to host. curl managed to get an IP address to the machine and it tried to setup a TCP connection to the host but failed. This can be because you have specified the wrong port number, entered the wrong host name, the wrong protocol or perhaps because there is a firewall or another network equipment in between that blocks the traffic from getting through."
 	else
- 	 echo "Erreur:  $code"
+ 	 echo "Error:  $code"
 	fi
 }
 
 function show_usage (){
-    echo "###############"
-    echo "# CHURL by jrowe #"
-    echo "###############"
-    echo "Utilisation: churl [IP/URL options [parameters]]"
-    echo " "
+    echo "Usage: churl [host (ip or url)] [parameters]]"
+	echo ""
     echo "Options:"
-    echo " -n 0-9      | Nombre de requètes à envoyer"
-    echo " -i          | Envoyer des requètes sans limite  (CTRL + C pour arrêter)"
-    echo " churl -h    | Afficher l'aide"
+    echo " -n 0-9      | Number of requests to send"
+    echo " -u          | Send unlimited requests  (Need CTRL + C for stop process)"
+    echo " -help       | Show this help"
 return 0
 }
 
 
-if [[ "$2" == "--help" ]] || [[ "$2" == "-h" ]] || [[ "$1" == "-h" ]] || [[ "$1" == "-h" ]];then
+
+if [[ "$@" == *"-help"* ]]
+then
     show_usage
-elif [[ "$2" == "-n" ]];then
-i=0
-while [ $i -ne $3 ]
- do
-    Check
-    sleep 1
-    i=$((i+1))
-done
-elif [[ "$2" == "-i" ]];then
-while true
- do
-    Check
-    sleep 1
- done
+elif [[ "$2" == "-n" ]]
+then
+	i=0
+	while [ $i -ne $3 ]
+	 do
+		check_host
+		sleep 1
+		i=$((i+1))
+	done
+elif [[ "$2" == "-u" ]]
+then
+	while true
+	 do
+		check_host
+		sleep 1
+	 done
 else
-    Check
+    check_host
 fi
 exit
